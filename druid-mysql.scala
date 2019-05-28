@@ -75,7 +75,7 @@ for (i <- 1 to nRow) {
   val timestampMySqlString = timestampFormat.format(timestamp)
   val timestampDruidString = timestampDruidFormat.format(timestamp)
   val mySqlQuery = new StringBuilder("insert into `test` values ('" + timestampMySqlString + "'")
-  val druidQuery = new StringBuilder("{\"time\":\"" + timestampMySqlString + "\"")
+  val druidQuery = new StringBuilder("{\"time\":\"" + timestampDruidString + "\"")
   for (j <- 1 to nCol) {
     mySqlQuery.append(
       ", " + i // incremental int
