@@ -1,5 +1,0 @@
-INFO  time: initialize in 0.63s
-WARN  no build tool detected in workspace 'd:\sc0521\scripts'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
-WARN  no build tool detected in workspace 'd:\sc0521\scripts'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
-INFO  no build target: using presentation compiler with only scala-library
-INFO  shutting down Metals

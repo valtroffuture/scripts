@@ -21,8 +21,9 @@ val nCol = 5
 val nRepeat = 10 // how many rows to use for repeating values
 
 // create table
-val mySqlSchema = new StringBuilder("create table `test` (`timestamp` TIMESTAMP")
+val mySqlSchema = new StringBuilder("create table `test` (`time484c39f77ace4808a5a48f6b481bafbe` TIMESTAMP")
 val druidSchema = new StringBuilder("{\"type\" : \"index\", \"spec\" : {\"dataSchema\" : {\"dataSource\" : \"test\", \"parser\" : { \"type\" : \"string\", \"parseSpec\" : { \"format\" : \"json\", \"dimensionsSpec\" : { \"dimensions\" : [")
+val metrics = new StringBuilder();
 for (i <- 1 to nCol) {
   mySqlSchema.append(
     ", `intInc" + i + "` INTEGER" // incremental int
@@ -42,11 +43,11 @@ for (i <- 1 to nCol) {
   )
   druidSchema.append(if (i == 1) "" else ",")
   druidSchema.append(
-    "\"intInc" + i + "\"" // incremental int
-    + ", \"intRep" + i + "\"" // repeating int
-    + ", \"dblInc" + i + "\"" // incremental double
-    + ", \"dblRep" + i + "\"" // repeating double
-    + ", \"strInc" + i + "\"" // incremental string
+    // "\"intInc" + i + "\"" // incremental int
+    // + ", \"intRep" + i + "\"" // repeating int
+    // + ", \"dblInc" + i + "\"" // incremental double
+    // + ", \"dblRep" + i + "\"" // repeating double
+    "\"strInc" + i + "\"" // incremental string
     + ", \"strRep" + i + "\"" // repeating string
     + ", \"decInc" + i + "\"" // incremental decimal
     + ", \"decRep" + i + "\"" // repeating decimal
@@ -57,9 +58,16 @@ for (i <- 1 to nCol) {
     + ", \"dateCur" + i + "\"" // timestamp date
     + ", \"dateInc" + i + "\"" // incremental date
   )
+  metrics.append(if (i == 1) "" else ",")
+  metrics.append(
+    "{\"type\":\"count\", \"name\": \"intInc" + i + "\", \"fieldName\": \"intInc" + i + "\"}" // incremental int
+    + ", {\"type\":\"count\", \"name\":\"intRep" + i + "\", \"fieldName\":\"intRep" + i + "\"}" // repeating int
+    + ", {\"type\":\"doubleSum\", \"name\":\"dblInc" + i + "\", \"fieldName\":\"dblInc" + i + "\"}" // incremental double
+    + ", {\"type\":\"doubleSum\", \"name\":\"dblRep" + i + "\", \"fieldName\":\"dblRep" + i + "\"}" // repeating double
+  )
 }
 mySqlSchema.append(");\n")
-druidSchema.append("]},\"timestampSpec\": {\"column\": \"time\", \"format\": \"iso\"}}},\"metricsSpec\" : [],\"granularitySpec\" : {\"type\" : \"uniform\",\"segmentGranularity\" : \"day\",\"queryGranularity\" : \"none\",\"intervals\" : [\"2015-09-12/2019-09-13\"],\"rollup\" : false}},\"ioConfig\" : {\"type\" : \"index\",\"firehose\" : {\"type\" : \"local\",\"baseDir\" : \"quickstart/tutorial/\",\"filter\" : \"test.json\"},\"appendToExisting\" : false},\"tuningConfig\" : {\"type\" : \"index\",\"maxRowsPerSegment\" : 5000000,\"maxRowsInMemory\" : 25000,\"forceExtendableShardSpecs\" : true}}}")
+druidSchema.append("]},\"timestampSpec\": {\"column\": \"time484c39f77ace4808a5a48f6b481bafbe\", \"format\": \"iso\"}}},\"metricsSpec\" : [" + metrics.toString + "],\"granularitySpec\" : {\"type\" : \"uniform\",\"segmentGranularity\" : \"day\",\"queryGranularity\" : \"none\",\"intervals\" : [\"2019-01-01/2020-01-01\"],\"rollup\" : false}},\"ioConfig\" : {\"type\" : \"index\",\"firehose\" : {\"type\" : \"local\",\"baseDir\" : \"quickstart/tutorial/\",\"filter\" : \"test.json\"},\"appendToExisting\" : false},\"tuningConfig\" : {\"type\" : \"index\",\"maxRowsPerSegment\" : 5000000,\"maxRowsInMemory\" : 25000,\"forceExtendableShardSpecs\" : true}}}")
 pwMySql.write(mySqlSchema.toString)
 pwDruidSchema.write(druidSchema.toString)
 pwDruidSchema.close
@@ -75,7 +83,7 @@ for (i <- 1 to nRow) {
   val timestampMySqlString = timestampFormat.format(timestamp)
   val timestampDruidString = timestampDruidFormat.format(timestamp)
   val mySqlQuery = new StringBuilder("insert into `test` values ('" + timestampMySqlString + "'")
-  val druidQuery = new StringBuilder("{\"time\":\"" + timestampDruidString + "\"")
+  val druidQuery = new StringBuilder("{\"time484c39f77ace4808a5a48f6b481bafbe\":\"" + timestampDruidString + "\"")
   for (j <- 1 to nCol) {
     mySqlQuery.append(
       ", " + i // incremental int
