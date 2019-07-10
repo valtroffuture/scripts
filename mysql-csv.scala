@@ -15,13 +15,13 @@ pwMySql.write("use `bigdata_db`;\n")
 pwMySql.write("drop table if exists `bigdata_tbl`;\n")
 
 // table settings
-val nRow = 100
+val nRow = 10000000
 val nCol = 5
 val nRepeat = 10 // how many rows to use for repeating values
 
 // create table
 val mySqlSchema = new StringBuilder("create table `bigdata_tbl` (`time484c39f77ace4808a5a48f6b481bafbe` TIMESTAMP")
-val metrics = new StringBuilder();
+val csvSchema = new StringBuilder("time484c39f77ace4808a5a48f6b481bafbe")
 for (i <- 1 to nCol) {
   mySqlSchema.append(
     ", `intInc" + i + "` INTEGER" // incremental int
@@ -39,9 +39,28 @@ for (i <- 1 to nCol) {
     + ", `dateCur" + i + "` DATE" // timestamp date
     + ", `dateInc" + i + "` DATE" // incremental date
   )
+  csvSchema.append(
+    ",intInc" + i // incremental int
+    + ",intRep" + i // repeating int
+    + ",dblInc" + i // incremental double
+    + ",dblRep" + i // repeating double
+    + ",strInc" + i // incremental string
+    + ",strRep" + i // repeating string
+    + ",decInc" + i // incremental decimal
+    + ",decRep" + i // repeating decimal
+    + ",boolInc" + i // incremental bool
+    + ",boolRep" + i // repeating bool
+    + ",smallInc" + i // incremental small
+    + ",smallRep" + i // repeating small
+    + ",dateCur" + i // timestamp date
+    + ",dateInc" + i // incremental date
+  )
 }
 mySqlSchema.append(");\n")
+mySqlSchema.append(");\n")
+csvSchema.append("\n")
 pwMySql.write(mySqlSchema.toString)
+pwCsv.write(csvSchema.toString)
 
 // add rows
 val ts = Timestamp.valueOf("2019-01-01 00:00:00")
@@ -55,22 +74,22 @@ for (i <- 1 to nRow) {
   val mySqlQuery = new StringBuilder("insert into `bigdata_tbl` values ('" + timestampMySqlString + "'")
   val csvQuery = new StringBuilder(timestampMySqlString)
   for (j <- 1 to nCol) {
-    mySqlQuery.append(
-      ", " + i // incremental int
-      + ", " + (i % nRepeat).toInt // repeating int
-      + ", " + (i / 100d) // incremental double
-      + ", " + (i % nRepeat / 100d) // repeating double
-      + ", 'strstrstrstrstrstr" + i + "'" // incremental string
-      + ", 'strstrstrstrstrstr" + (i % nRepeat).toLong + "'" // repeating string
-      + ", " + (i / 100d) // incremental decimal
-      + ", " + (i % nRepeat / 100d) // repeating decimal
-      + ", " + (i % 2) // incremental bool
-      + ", " + ((i / nRepeat).toLong % 2) // repeating bool
-      + ", " + (i % 32768).toShort // incremental short
-      + ", " + (i % 32768 % nRepeat).toShort // repeating short
-      + ", '" + dateFormat.format(timestampLong) + "'" // timestamp date
-      + ", '" + dateFormat.format(new Date(timestampLong + i * 86400L * 1000L)) + "'" // incremental date
-    )
+    // mySqlQuery.append(
+    //   ", " + i // incremental int
+    //   + ", " + (i % nRepeat).toInt // repeating int
+    //   + ", " + (i / 100d) // incremental double
+    //   + ", " + (i % nRepeat / 100d) // repeating double
+    //   + ", 'strstrstrstrstrstr" + i + "'" // incremental string
+    //   + ", 'strstrstrstrstrstr" + (i % nRepeat).toLong + "'" // repeating string
+    //   + ", " + (i / 100d) // incremental decimal
+    //   + ", " + (i % nRepeat / 100d) // repeating decimal
+    //   + ", " + (i % 2) // incremental bool
+    //   + ", " + ((i / nRepeat).toLong % 2) // repeating bool
+    //   + ", " + (i % 32768).toShort // incremental short
+    //   + ", " + (i % 32768 % nRepeat).toShort // repeating short
+    //   + ", '" + dateFormat.format(timestampLong) + "'" // timestamp date
+    //   + ", '" + dateFormat.format(new Date(timestampLong + i * 86400L * 1000L)) + "'" // incremental date
+    // )
     csvQuery.append(
       "," + i // incremental int
       + "," + (i % nRepeat).toInt // repeating int
@@ -84,8 +103,8 @@ for (i <- 1 to nRow) {
       + "," + ((i / nRepeat).toLong % 2) // repeating bool
       + "," + (i % 32768).toShort // incremental short
       + "," + (i % 32768 % nRepeat).toShort // repeating short
-      + ",'" + dateFormat.format(timestampLong) + "'" // timestamp date
-      + ",'" + dateFormat.format(new Date(timestampLong + i * 86400L * 1000L)) + "'" // incremental date
+      + "," + dateFormat.format(timestampLong) + "" // timestamp date
+      + "," + dateFormat.format(new Date(timestampLong + i * 86400L * 1000L)) + "" // incremental date
     )
   }
   mySqlQuery.append(");\n")
