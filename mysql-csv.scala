@@ -37,7 +37,6 @@ for (i <- 1 to nCol) {
     + ", `smallInc" + i + "` SMALLINT" // incremental small
     + ", `smallRep" + i + "` SMALLINT" // repeating small
     + ", `dateCur" + i + "` DATE" // timestamp date
-    + ", `dateInc" + i + "` DATE" // incremental date
   )
   csvSchema.append(
     ",intInc" + i // incremental int
@@ -53,10 +52,8 @@ for (i <- 1 to nCol) {
     + ",smallInc" + i // incremental small
     + ",smallRep" + i // repeating small
     + ",dateCur" + i // timestamp date
-    + ",dateInc" + i // incremental date
   )
 }
-mySqlSchema.append(");\n")
 mySqlSchema.append(");\n")
 csvSchema.append("\n")
 pwMySql.write(mySqlSchema.toString)
@@ -71,7 +68,7 @@ for (i <- 1 to nRow) {
   val timestampLong = ts.getTime + i * 1000L
   val timestamp = new Timestamp(timestampLong)
   val timestampMySqlString = timestampFormat.format(timestamp)
-  val mySqlQuery = new StringBuilder("insert into `bigdata_tbl` values ('" + timestampMySqlString + "'")
+  //val mySqlQuery = new StringBuilder("insert into `bigdata_tbl` values ('" + timestampMySqlString + "'")
   val csvQuery = new StringBuilder(timestampMySqlString)
   for (j <- 1 to nCol) {
     // mySqlQuery.append(
@@ -104,14 +101,15 @@ for (i <- 1 to nRow) {
       + "," + (i % 32768).toShort // incremental short
       + "," + (i % 32768 % nRepeat).toShort // repeating short
       + "," + dateFormat.format(timestampLong) + "" // timestamp date
-      + "," + dateFormat.format(new Date(timestampLong + i * 86400L * 1000L)) + "" // incremental date
     )
   }
-  mySqlQuery.append(");\n")
-  pwMySql.write(mySqlQuery.toString)
+  //mySqlQuery.append(");\n")
+  //pwMySql.write(mySqlQuery.toString)
   csvQuery.append("\n")
   pwCsv.write(csvQuery.toString)
 }
+
+pwMySql.write("LOAD DATA INFILE '/var/lib/mysql-files/bigdata.csv' INTO TABLE bigdata_tbl FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\\n' IGNORE 1 ROWS;")
 
 pwMySql.close
 pwCsv.close
